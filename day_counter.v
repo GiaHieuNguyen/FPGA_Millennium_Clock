@@ -5,15 +5,15 @@ module day_counter(
     input  wire       dec,
     input  wire       ctrl_set,
     input  wire       carry_in_hour,
-    input  wire [3:0] current_month,   // 1..12
+    input  wire [3:0] current_month,   
     input  wire       is_leap_year,
-    output reg  [5:0] day_count,       // 1..31
+    output reg  [5:0] day_count,       
     output            carry_out
 );
-    reg [5:0] END_OF_MONTH; // Days in the current month
-    reg [5:0] END_OF_PREVIOUS_MONTH; // Days in the previous month
+    reg [5:0] END_OF_MONTH;           // Days in the current month
+    reg [5:0] END_OF_PREVIOUS_MONTH;  // Days in the previous month
 
-    always @(*) begin
+    always @(current_month or is_leap_year) begin
         case (current_month)
             2: begin
                 END_OF_MONTH = (is_leap_year) ? 29 : 28;
@@ -32,9 +32,8 @@ module day_counter(
 
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            day_count <= 1; // Start from day 1
+            day_count <= 1; 
             end else begin
-            //carry_out <= 0;
             if(ctrl_set) begin
                 if(inc) begin
                     if(day_count == END_OF_MONTH) begin

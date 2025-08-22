@@ -1,4 +1,5 @@
-module clk_1hz #(parameter HALF_CYCLE = 25_000_000-1
+module clk_1hz #(
+    parameter HALF_CYCLE = 25_000_000 - 1
 )(
     input clk_50MHz,
     input rst_n,

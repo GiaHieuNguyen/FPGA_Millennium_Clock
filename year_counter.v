@@ -1,6 +1,6 @@
 module year_counter #(
-    parameter integer BASE_YEAR = 2025,
-    parameter integer MAX_YEAR  = 3025
+    parameter BASE_YEAR = 2025,
+    parameter MAX_YEAR  = 3025
 )(
     input clk,
     input rst_n,
@@ -13,7 +13,7 @@ module year_counter #(
     wire tick_year = carry_in_month;
     always @(posedge clk or negedge rst_n) begin
         if(!rst_n) begin
-            year_count <= BASE_YEAR; // Start from year 2025
+            year_count <= BASE_YEAR; 
         end else begin
             if(ctrl_set) begin
                 if(inc) begin
@@ -31,7 +31,7 @@ module year_counter #(
                 end
             end else if (tick_year) begin
                     if (year_count == MAX_YEAR) begin
-                    year_count <= BASE_YEAR; // Reset to 0 when year rolls over
+                    year_count <= BASE_YEAR; 
                 end else begin
                     year_count <= year_count + 1;
                 end

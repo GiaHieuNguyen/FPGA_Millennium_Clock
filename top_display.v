@@ -1,25 +1,26 @@
-//   mode_date=0:  [HEX7:blank][HEX6:blank][HEX5..HEX4:HH][HEX3..HEX2:MM][HEX1..HEX0:SS]
-//   mode_date=1:  [HEX7..HEX6:DD][HEX5..HEX4:MM][HEX3..HEX0:YYYY]
+//   Connects BCD convertors to HEX displays and blink digits based on set signals.
+//   mode_date=0:  HH:MM:SS
+//   mode_date=1:  DD:MM:YYYY
 
 module top_display(
     input  wire        mode_date,     // 0=time, 1=date
-    // time
+    
     input  wire [4:0]  hour,
     input  wire [5:0]  min,
     input  wire [5:0]  sec,
-    // date
+    
     input  wire [5:0]  day,
     input  wire [3:0]  month,
-    input  wire [11:0] year,          // 2025..3025
-    // control signals
-    input  wire        clk_1hz,      // 1Hz clock signal
-    input  wire        set_sec,      // Set seconds
-    input  wire        set_min,      // Set minutes
-    input  wire        set_hour,     // Set hours
-    input  wire        set_day,      // Set day
-    input  wire        set_month,    // Set month
-    input  wire        set_year,     // Set year
-    // HEX outputs (active-low segments)
+    input  wire [11:0] year,          
+    
+    input  wire        clk_1hz,      
+    input  wire        set_sec,      
+    input  wire        set_min,      
+    input  wire        set_hour,     
+    input  wire        set_day,      
+    input  wire        set_month,    
+    input  wire        set_year,     
+    
     output wire [6:0]  HEX7,
     output wire [6:0]  HEX6,
     output wire [6:0]  HEX5,
@@ -29,10 +30,11 @@ module top_display(
     output wire [6:0]  HEX1,
     output wire [6:0]  HEX0
 );
-    // --------- BCD conversions ----------
+    
     wire [3:0] h_t, h_o, m_t, m_o, s_t, s_o;
     wire [3:0] d_t, d_o, mo_t, mo_o;
     wire [3:0] y_th, y_h, y_t, y_o;
+    reg [3:0] dig7, dig6, dig5, dig4, dig3, dig2, dig1, dig0;
 
     bin_to_bcd_0_23 u_h (.bin(hour), .tens(h_t), .ones(h_o));
     bin_to_bcd_0_59 u_m (.bin(min),  .tens(m_t), .ones(m_o));
@@ -43,22 +45,21 @@ module top_display(
 
     bin_to_bcd_year  u_y (.year(year), .d_thou(y_th), .d_hund(y_h), .d_tens(y_t), .d_ones(y_o));
 
-    // --------- Digit MUX for the 8 displays ----------
-    // Choose which BCD nibble goes to which HEX based on mode_date
-    reg [3:0] dig7, dig6, dig5, dig4, dig3, dig2, dig1, dig0;
-
-    reg [7:0] blink_mask;
-    always @(*) begin
-        blink_mask = 8'b00000000; // Default: no blinking
-        if (set_sec) blink_mask[0] = 1'b1;
-        if (set_min) blink_mask[1] = 1'b1;
-        if (set_hour) blink_mask[2] = 1'b1;
-        if (set_day) blink_mask[3] = 1'b1;
-        if (set_month) blink_mask[4] = 1'b1;
-        if (set_year) blink_mask[5] = 1'b1;
+    reg [5:0] blink_mask;
+    always @(set_sec or set_min or set_hour or set_day or set_month or set_year) begin
+        if      (set_sec)   blink_mask[0] = 1'b1;
+        else if (set_min)   blink_mask[1] = 1'b1;
+        else if (set_hour)  blink_mask[2] = 1'b1;
+        else if (set_day)   blink_mask[3] = 1'b1;
+        else if (set_month) blink_mask[4] = 1'b1;
+        else if (set_year)  blink_mask[5] = 1'b1;
+        else                blink_mask = 6'b000000; // No blinking
     end
 
-    always @* begin
+    always @(mode_date or blink_mask or clk_1hz or 
+         h_t or h_o or m_t or m_o or s_t or s_o or
+         d_t or d_o or mo_t or mo_o or 
+         y_th or y_h or y_t or y_o) begin
         if (mode_date == 1'b0) begin
             // TIME: __ HH MM SS
             dig7 = 4'd10;
@@ -82,7 +83,6 @@ module top_display(
         end
     end
 
-    // --------- 7-seg encoders ----------
     seg7_dec u7(.digit(dig7), .HEX(HEX7));
     seg7_dec u6(.digit(dig6), .HEX(HEX6));
     seg7_dec u5(.digit(dig5), .HEX(HEX5));

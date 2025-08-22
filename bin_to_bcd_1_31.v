@@ -3,8 +3,8 @@ module bin_to_bcd_1_31(
     output reg  [3:0] tens,
     output reg  [3:0] ones
 );
-    reg [5:0] tmp; // up to 31
-    always @* begin
+    reg [5:0] tmp; 
+    always @(bin) begin
         tmp  = bin;
         tens = 4'd0;
         if (tmp >= 30) begin tens = 4'd3; tmp = tmp - 30; end

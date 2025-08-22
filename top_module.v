@@ -1,8 +1,9 @@
-// Top mmodule for FPGA pins: connects counters to HEX displays.
+// Connects counters to HEX displays.
 // mode_date=0 -> show HH:MM:SS
 // mode_date=1 -> show DD/MM/YYYY
+
 module top_module(
-    input [17:0]       SW, // 18 switches
+    input [17:0]       SW, 
     input  wire        clk_50MHz,
     output wire [6:0]  HEX7,
     output wire [6:0]  HEX6,
@@ -25,12 +26,12 @@ module top_module(
     top_counter u_cnt (
         .clk_50MHz   (clk_50MHz),
         .rst_n       (SW[17]),
-        .set_sec     (SW[1]), // Set seconds
-        .set_min     (SW[2]), // Set minutes
-        .set_hour    (SW[3]), // Set hours
-        .set_day     (SW[4]), // Set day
-        .set_month   (SW[5]), // Set month
-        .set_year    (SW[6]), // Set year
+        .set_sec     (SW[1]), 
+        .set_min     (SW[2]), 
+        .set_hour    (SW[3]), 
+        .set_day     (SW[4]), 
+        .set_month   (SW[5]), 
+        .set_year    (SW[6]), 
         .inc         (SW[15]),       
         .dec         (SW[16]),
         .sec         (sec),
@@ -39,18 +40,17 @@ module top_module(
         .day         (day),
         .month       (month),
         .year        (year),
-        .clk_1hz     (clk_1hz), 
-        .is_leap_year(is_leap_year)
+        .clk_1hz     (clk_1hz)
     );
  
     top_display u_disp (
         .clk_1hz     (clk_1hz),
-        .set_sec     (SW[1]), // Set seconds
-        .set_min     (SW[2]), // Set minutes
-        .set_hour    (SW[3]), // Set hours
-        .set_day     (SW[4]), // Set day
-        .set_month   (SW[5]), // Set month
-        .set_year    (SW[6]), // Set year
+        .set_sec     (SW[1]), 
+        .set_min     (SW[2]), 
+        .set_hour    (SW[3]), 
+        .set_day     (SW[4]), 
+        .set_month   (SW[5]), 
+        .set_year    (SW[6]), 
         .mode_date   (mode_date),
         .hour(hour), .min(min), .sec(sec),
         .day(day), .month(month), .year(year),
