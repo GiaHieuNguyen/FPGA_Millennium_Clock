@@ -47,12 +47,12 @@ module top_display(
 
     reg [5:0] blink_mask;
     always @(set_sec or set_min or set_hour or set_day or set_month or set_year) begin
-        if      (set_sec)   blink_mask[0] = 1'b1;
-        else if (set_min)   blink_mask[1] = 1'b1;
-        else if (set_hour)  blink_mask[2] = 1'b1;
-        else if (set_day)   blink_mask[3] = 1'b1;
-        else if (set_month) blink_mask[4] = 1'b1;
-        else if (set_year)  blink_mask[5] = 1'b1;
+        if      (set_sec)   blink_mask = 6'b000001;
+        else if (set_min)   blink_mask = 6'b000010;
+        else if (set_hour)  blink_mask = 6'b000100;
+        else if (set_day)   blink_mask = 6'b001000;
+        else if (set_month) blink_mask = 6'b010000;
+        else if (set_year)  blink_mask = 6'b100000;
         else                blink_mask = 6'b000000; // No blinking
     end
 

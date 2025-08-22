@@ -20,6 +20,26 @@ module top_counter(
 );
     wire sec_carry_raw, min_carry_raw, 
         hour_carry_raw, day_carry_raw, month_carry_raw, is_leap_year;
+
+    wire freeze = set_min | set_hour | set_day | set_month | set_year;
+
+    reg [5:0]blink_mask;
+    wire set_sec_in   = blink_mask[0];
+    wire set_min_in   = blink_mask[1];
+    wire set_hour_in  = blink_mask[2];
+    wire set_day_in   = blink_mask[3];
+    wire set_month_in = blink_mask[4];
+    wire set_year_in  = blink_mask[5];
+
+    always @(set_sec or set_min or set_hour or set_day or set_month or set_year) begin
+        if      (set_sec)   blink_mask = 6'b000001;
+        else if (set_min)   blink_mask = 6'b000010;
+        else if (set_hour)  blink_mask = 6'b000100;
+        else if (set_day)   blink_mask = 6'b001000;
+        else if (set_month) blink_mask = 6'b010000;
+        else if (set_year)  blink_mask = 6'b100000;
+        else                blink_mask = 6'b000000;
+    end
     
     clk_1hz #(25000000 - 1) u_clk1hz (
         .clk_50MHz(clk_50MHz),
@@ -32,7 +52,8 @@ module top_counter(
         .rst_n(rst_n),
         .inc(inc),
         .dec(dec),
-        .ctrl_set(set_sec),
+        .freeze(freeze),
+        .ctrl_set(set_sec_in),
         .sec_count(sec),
         .carry_out(sec_carry_raw)
     );
@@ -42,7 +63,7 @@ module top_counter(
         .rst_n(rst_n),
         .inc(inc),
         .dec(dec),
-        .ctrl_set(set_min),
+        .ctrl_set(set_min_in),
         .carry_in_sec(sec_carry_raw),
         .min_count(min),
         .carry_out(min_carry_raw)
@@ -53,7 +74,7 @@ module top_counter(
         .rst_n(rst_n),
         .inc(inc),
         .dec(dec),
-        .ctrl_set(set_hour),
+        .ctrl_set(set_hour_in),
         .carry_in_min(min_carry_raw),
         .hour_count(hour),
         .carry_out(hour_carry_raw)
@@ -64,7 +85,7 @@ module top_counter(
         .rst_n(rst_n),
         .inc(inc), 
         .dec(dec), 
-        .ctrl_set(set_day),
+        .ctrl_set(set_day_in),
         .carry_in_hour(hour_carry_raw),
         .current_month(month), 
         .is_leap_year(is_leap_year),
@@ -77,7 +98,7 @@ module top_counter(
         .rst_n(rst_n),
         .inc(inc), 
         .dec(dec), 
-        .ctrl_set(set_month),
+        .ctrl_set(set_month_in),
         .carry_in_day(day_carry_raw),
         .month_count(month), 
         .carry_out(month_carry_raw)
@@ -88,7 +109,7 @@ module top_counter(
         .rst_n(rst_n),
         .inc(inc), 
         .dec(dec), 
-        .ctrl_set(set_year),
+        .ctrl_set(set_year_in),
         .carry_in_month(month_carry_raw),
         .year_count(year)
     );

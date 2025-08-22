@@ -43,7 +43,7 @@ module day_counter(
                     end
                 end else if(dec) begin
                     if(day_count == 1) begin
-                        day_count <= END_OF_PREVIOUS_MONTH;
+                        day_count <= END_OF_MONTH;
                     end else begin
                         day_count <= day_count - 1;
                     end

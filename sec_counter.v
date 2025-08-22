@@ -1,15 +1,18 @@
 module sec_counter(
-    input  wire       clk,
+    input        clk,
     input  wire       rst_n,
     input  wire       inc,
     input  wire       dec,
     input  wire       ctrl_set,
+    input  wire       freeze,
     output reg  [5:0] sec_count, 
     output            carry_out
 );
     always @(posedge clk or negedge rst_n) begin
         if (!rst_n) begin
             sec_count <= 6'd0;
+        end else if (freeze) begin
+            sec_count <= sec_count;
         end else begin
             if (ctrl_set) begin
                 if (inc)      sec_count <= (sec_count == 6'd59) ? 6'd0  : sec_count + 6'd1;
